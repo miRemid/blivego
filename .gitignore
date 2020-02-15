@@ -1,0 +1,32 @@
+# Exclude config file
+.vscode/
+.idea/
+
+# Exclude Qt file
+deploy/
+qamel-*
+moc-*
+*.qmlc
+*.jsc
+*_plugin_import.cpp
+
+# Exclude generated file
+*.syso
+*.log
+*.exe
+/.qamel-cache
+
+# Exclude vendor for Go mod
+/vendor
+
+# test directory
+develop
+# binary software
+bililive-go
+# build script
+build
+# test software script
+test-build
+# static
+static
+main.qml.bk
