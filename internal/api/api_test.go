@@ -40,6 +40,7 @@ func testGetQRCode() {
 				if err := SaveCookies(); err != nil {
 					log.Fatal(err)
 				}
+				SetCSRF()
 				goto getInfo
 			}
 		next:
@@ -50,11 +51,6 @@ func testGetQRCode() {
 		}
 	}
 getInfo:
-	user, err := GetPersonInfomation()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(user.Data.Uname)
 }
 
 func testCheckCookies(t *testing.T) {
@@ -75,9 +71,18 @@ func TestLoadCookies(t *testing.T) {
 		log.Fatal(err)
 	}
 getInfo:
+	log.Println("csrf=", CSRF)
+	log.Println("sessionid=", SessionID)
 	info, err := GetPersonInfomation()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(info)
+	if info.Status {
+		log.Println(info.Data.Uname)
+	} else {
+		log.Fatal(info.Message)
+	}
+	if err := SendDanmaku("test", 56159, 16777215, 25); err != nil {
+		log.Fatal(err)
+	}
 }

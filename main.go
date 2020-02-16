@@ -9,6 +9,8 @@ import (
 
 	_ "bililive-go/log"
 
+	_ "bililive-go/internal/api"
+
 	_ "bililive-go/internal"
 )
 

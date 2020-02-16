@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -35,6 +36,8 @@ const (
 	originURL   = "https://passport.bilibili.com"
 
 	cookiesPath = "static/user/cookies.json"
+
+	liveDanmaURL = "https://api.live.bilibili.com/msg/send"
 )
 
 var (
@@ -43,6 +46,11 @@ var (
 
 	// CSRF b站csrf跨域请求token，登陆时返回url可解析
 	CSRF string
+	// SessionID 登陆唯一标志
+	SessionID string
+
+	// Useful 作为往期cookies是否可用的标志
+	Useful bool
 )
 
 func init() {
@@ -55,32 +63,54 @@ func init() {
 	} else {
 		jar = j
 	}
-	Setup()
+
+	// 导入往期cookies
+	// 如果没有cookies或导入失败，则清除jar所有cookies
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			log.Error("cookies文件未找到， %s", cookiesPath)
+		} else {
+			log.Error(err.Error())
+		}
+	}
+
 	client = &http.Client{
 		Timeout: time.Second * time.Duration(10),
 		Jar:     jar,
 	}
 }
 
-// Setup 初始化操作
-func Setup() {
-	if err := loadCookies(); err != nil {
-		if os.IsNotExist(err) {
-			jar.RemoveAll()
-			log.Error("cookies文件未找到， %s", cookiesPath)
-		} else {
-			log.Error(err.Error())
-		}
+// 保存cookies到文件中
+func loadCookies() error {
+	var cookies = make([]*http.Cookie, 0)
+	data, err := ioutil.ReadFile(cookiesPath)
+	if err != nil {
+		return err
 	}
+	if err := json.Unmarshal(data, &cookies); err != nil {
+		return err
+	}
+	u, err := url.Parse(originURL)
+	if err != nil {
+		return err
+	}
+	// 1. 设置cookies
+	jar.SetCookies(u, cookies)
+	// 2. 获取cookie信息
+	SetCSRF()
+	return nil
 }
 
-// CheckCookies 检查cookies是否有效
-func CheckCookies() (bool, error) {
-	info, err := GetPersonInfomation()
-	if err != nil {
-		return false, err
+// SetCSRF 保存相应信息
+func SetCSRF() {
+	cookies := jar.AllCookies()
+	for _, cookie := range cookies {
+		if cookie.Name == "bili_jct" {
+			CSRF = cookie.Value
+		} else if cookie.Name == "SESSDATA" {
+			SessionID = cookie.Value
+		}
 	}
-	return info.Status, nil
 }
 
 // GetQRCode this will send a qrcode request and save the qrcode into the file at the static directory
@@ -147,19 +177,39 @@ func SaveCookies() error {
 	return jar.Save()
 }
 
-func loadCookies() error {
-	var cookies = make([]*http.Cookie, 0)
-	data, err := ioutil.ReadFile(cookiesPath)
+// SendDanmaku 发送弹幕
+func SendDanmaku(message string, roomid, color, fontsize int) (models.DanmakuResponse, error) {
+	data := make(url.Values)
+	data.Set("msg", message)
+	data.Set("color", fmt.Sprintf("%d", color))
+	data.Set("fontsize", fmt.Sprintf("%d", fontsize))
+	data.Set("mode", "1")
+	data.Set("rnd", fmt.Sprintf("%d", time.Now().Unix()))
+	data.Set("roomid", fmt.Sprintf("%d", roomid))
+	data.Set("bubble", "0")
+	data.Set("csrf_token", CSRF)
+	data.Set("csrf", CSRF)
+	req, _ := http.NewRequest("POST", liveDanmaURL, strings.NewReader(data.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	req.Header.Add("Referer", fmt.Sprintf("https://live.bilibili.com/%d", roomid))
+	req.Header.Add("Origin", "https://live.bilibili.com")
+	req.Header.Add("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Add("Sec-Fetch-Mode", "cors")
+	req.Header.Add("Sec-Fetch-Site", "same-site")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36")
+	var response models.DanmakuResponse
+	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return response, err
 	}
-	if err := json.Unmarshal(data, &cookies); err != nil {
-		return err
+	log.Debug("请求直播弹幕API:%s, 状态码:%d", liveDanmaURL, resp.StatusCode)
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &response)
+	if response.Code == 0 {
+		log.Debug("弹幕发送成功,Roomid=%d,Message=%s", roomid, message)
+	} else {
+		log.Warning("弹幕发送失败, Error=%s", response.Message)
 	}
-	u, err := url.Parse(originURL)
-	if err != nil {
-		return err
-	}
-	jar.SetCookies(u, cookies)
-	return nil
+	return response, err
 }
