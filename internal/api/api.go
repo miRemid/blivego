@@ -31,9 +31,11 @@ const (
 	qrcodeURL = "https://passport.bilibili.com/qrcode/getLoginUrl"
 	checkURL  = "https://passport.bilibili.com/qrcode/getLoginInfo"
 
-	userInfoURL = "https://account.bilibili.com/home/userInfo"
+	userInfoURL = "https://api.bilibili.com/x/web-interface/nav"
 	goURL       = "https://live.bilibili.com/"
 	originURL   = "https://passport.bilibili.com"
+	roomidURL   = "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld"
+	followURL   = "https://api.bilibili.com/x/web-interface/nav/stat"
 
 	cookiesPath = "static/user/cookies.json"
 
@@ -156,12 +158,11 @@ func CheckLogin(oauth string) (models.CheckLogin, error) {
 }
 
 // GetPersonInfomation 获取个人信息
-func GetPersonInfomation() (models.User, error) {
-	var user models.User
-	req, err := http.NewRequest("GET", userInfoURL, nil)
-	if err != nil {
-		return user, err
-	}
+func GetPersonInfomation() (models.FullUserInfomation, error) {
+	var user models.FullUserInfomation
+	req, _ := http.NewRequest("GET", userInfoURL, nil)
+	req.Header.Add("Origin", "https://space.bilibili.com")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
 	resp, err := client.Do(req)
 	if err != nil {
 		return user, err
@@ -212,4 +213,37 @@ func SendDanmaku(message string, roomid, color, fontsize int) (models.DanmakuRes
 		log.Warning("弹幕发送失败, Error=%s", response.Message)
 	}
 	return response, err
+}
+
+// GetLiveRoomInfo 获取直播间信息
+func GetLiveRoomInfo(id int) (models.LiveRoom, error) {
+	var live models.LiveRoom
+	data := url.Values{}
+	data.Set("mid", fmt.Sprintf("%d", id))
+	req, _ := http.NewRequest("GET", liveDanmaURL, strings.NewReader(data.Encode()))
+	req.Header.Add("Origin", "https://space.bilibili.com")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		return live, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &live)
+	return live, err
+}
+
+func GetFollow() (models.Follow, error) {
+	var f models.Follow
+	req, _ := http.NewRequest("GET", followURL, nil)
+	req.Header.Add("Origin", "https://space.bilibili.com")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		return f, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &f)
+	return f, err
 }

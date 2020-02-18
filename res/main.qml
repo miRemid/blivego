@@ -14,12 +14,12 @@ Item {
         function _onError(error) {
             let data = JSON.parse(error)
             if (data.code == 1) {
-                console.log("cookies不存在或失效，重新登陆")
                 loginView.visible = true
             }
         }
 
         function _onSuccess(jsonValue) {
+            indexView.visible = true
             let data = JSON.parse(jsonValue)
             for (let key in data) {
                 console.log(key, data[key])
@@ -30,11 +30,17 @@ Item {
 
         onSuccess: (data) => _onSuccess(data)
     }
-
+    MyComponents.Index {
+        id: indexView
+        visible: false
+        anchors.fill: parent
+        z: 1
+    }
     MyComponents.Login {
         id: "loginView"
         visible: false
         anchors.centerIn: parent
+        z: 2
     }
     
     Component.onCompleted: {
@@ -44,7 +50,8 @@ Item {
     Connections {
         target: loginView
         onSuccess: {
-            console.log("登陆成功")
+            loginView.visible = false
+            indexView.visible = true
         }
     }
 }

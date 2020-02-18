@@ -77,12 +77,14 @@ getInfo:
 	if err != nil {
 		log.Fatal(err)
 	}
-	if info.Status {
+	if info.Code == 0 {
 		log.Println(info.Data.Uname)
 	} else {
 		log.Fatal(info.Message)
 	}
-	if err := SendDanmaku("test", 56159, 16777215, 25); err != nil {
+	if response, err := SendDanmaku("test", 56159, 16777215, 25); err != nil {
 		log.Fatal(err)
+	} else {
+		log.Println(response)
 	}
 }
