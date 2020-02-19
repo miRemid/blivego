@@ -53,28 +53,40 @@ func (info Infomation) getInfomation() {
 			})
 			info.error(e)
 		} else {
-			// 保存用户信息
-			user = infomation.Data
-			// 返回用户信息用于展示
-			var response UserDisplay
-			response.Uname = user.Uname
-			response.Avator = user.Face
-			response.UID = user.Wallet.Mid
-			if live, err := api.GetLiveRoomInfo(user.Wallet.Mid); err != nil {
-				info.error(err.Error())
-			} else {
-				response.Roomid = live.Data.Roomid
-				response.RoomStatus = live.Data.RoomStatus
-				response.RoomTitle = live.Data.Title
-			}
-			if stat, err := api.GetFollow(); err != nil {
-				info.error(err.Error())
-			} else {
-				response.Fans = stat.Data.Follower
-			}
-			data, _ := utils.EncodeJSON(response)
-			info.success(data)
 			api.Useful = true
+			go func() {
+				// 保存用户信息
+				user = infomation.Data
+				// 返回用户信息用于展示
+				var response UserDisplay
+				response.Uname = user.Uname
+				response.Avator = user.Face
+				// 获取本人直播间信息
+				if live, err := api.GetLiveRoomInfo(user.Wallet.Mid); err != nil {
+					e, _ := utils.EncodeJSON(BackEndError{
+						Code:    apiError,
+						Message: err.Error(),
+					})
+					info.error(e)
+				} else {
+					response.Roomid = live.Data.Roomid
+					response.RoomStatus = live.Data.RoomStatus
+					response.RoomTitle = live.Data.Title
+				}
+				// 获取本人粉丝数
+				if stat, err := api.GetFollow(); err != nil {
+					info.error(err.Error())
+				} else {
+					response.Fans = stat.Data.Follower
+				}
+				data, _ := utils.EncodeJSON(response)
+				info.success(data)
+				items, err := api.GetLiveList()
+				if err != nil {
+					log.Error(err.Error())
+				}
+				go saveLiveItems(items)
+			}()
 		}
 		break
 	}

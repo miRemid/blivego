@@ -5,7 +5,7 @@ type LiveItems struct {
 	Data []LiveItemsData `json:"data"`
 }
 
-type List struct {
+type Item struct {
 	ID         string `json:"id"`
 	ParentID   string `json:"parent_id"`
 	OldAreaID  string `json:"old_area_id"`
@@ -22,5 +22,5 @@ type List struct {
 type LiveItemsData struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
-	List []List `json:"list"`
+	List []Item `json:"list"`
 }

@@ -34,12 +34,13 @@ const (
 	userInfoURL = "https://api.bilibili.com/x/web-interface/nav"
 	goURL       = "https://live.bilibili.com/"
 	originURL   = "https://passport.bilibili.com"
-	roomidURL   = "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld"
+	roomidURL   = "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=%d"
 	followURL   = "https://api.bilibili.com/x/web-interface/nav/stat"
 
 	cookiesPath = "static/user/cookies.json"
 
 	liveDanmaURL = "https://api.live.bilibili.com/msg/send"
+	liveList     = "https://api.live.bilibili.com/room/v1/Area/getList"
 )
 
 var (
@@ -218,9 +219,8 @@ func SendDanmaku(message string, roomid, color, fontsize int) (models.DanmakuRes
 // GetLiveRoomInfo 获取直播间信息
 func GetLiveRoomInfo(id int) (models.LiveRoom, error) {
 	var live models.LiveRoom
-	data := url.Values{}
-	data.Set("mid", fmt.Sprintf("%d", id))
-	req, _ := http.NewRequest("GET", liveDanmaURL, strings.NewReader(data.Encode()))
+	url := fmt.Sprintf(roomidURL, id)
+	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Origin", "https://space.bilibili.com")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
 	resp, err := client.Do(req)
@@ -233,6 +233,7 @@ func GetLiveRoomInfo(id int) (models.LiveRoom, error) {
 	return live, err
 }
 
+// GetFollow 获取粉丝数
 func GetFollow() (models.Follow, error) {
 	var f models.Follow
 	req, _ := http.NewRequest("GET", followURL, nil)
@@ -246,4 +247,18 @@ func GetFollow() (models.Follow, error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &f)
 	return f, err
+}
+
+// GetLiveList 获取直播分类表
+func GetLiveList() (models.LiveItems, error) {
+	var items models.LiveItems
+	req, _ := http.NewRequest(http.MethodGet, liveList, nil)
+	resp, err := client.Do(req)
+	if err != nil {
+		return items, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &items)
+	return items, err
 }

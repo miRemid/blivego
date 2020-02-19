@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtGraphicalEffects 1.0
 import "fonts/FontAwesome" as FontAwesome
+import "items" as Items
 
 Rectangle {
     id: root
@@ -13,6 +14,7 @@ Rectangle {
     property string uname: "测试用户名"
     property int fans: 66
     property int roomid: 114154
+
     color: "#e6f7ff"
 
     Image {  
@@ -72,10 +74,11 @@ Rectangle {
         font {
             pixelSize: 20
         }
+        color: "#004d73"
         text: root.uname
     }  
 
-    // 房间号
+    // 粉丝数
     Label {
         id: fans
         anchors {
@@ -105,7 +108,52 @@ Rectangle {
         }          
     }
     
+    // 直播采集数据
+    Row{
+        id: liveStatus
+        visible: false
+        width: root.width
+        anchors {
+            top: roomid.bottom
+            bottom: btn.top
+            horizontalCenter: root.horizontalCenter
+        }        
+        // 观看人数
+        spacing: 4
+        Items.Data {
+            id: red
+            width: 80
+            title: "人气"
+            titleColor: "#0099e6"
+            anchors {
+                centerIn: parent
+            }
+        }
+        Items.Data {
+            width: 80
+            title: "礼物"
+            titleColor: "#0099e6"
+
+            anchors {
+                left: red.right
+                leftMargin: 10
+                verticalCenter: parent.verticalCenter
+            }
+        }
+        Items.Data {
+            width: 80
+            title: "弹幕"        
+            titleColor: "#0099e6"
+            anchors {
+                right: red.left
+                rightMargin: 10
+                verticalCenter: parent.verticalCenter
+            }
+        }
+    }
+
     MyButton {
+        id: btn
         anchors {
             horizontalCenter: root.horizontalCenter
             bottom: root.bottom

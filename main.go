@@ -3,8 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/go-qamel/qamel"
-
 	_ "bililive-go/config"
 
 	_ "bililive-go/log"
@@ -12,6 +10,8 @@ import (
 	_ "bililive-go/internal/api"
 
 	_ "bililive-go/internal"
+
+	"github.com/go-qamel/qamel"
 )
 
 func main() {
@@ -20,7 +20,6 @@ func main() {
 	app.SetApplicationDisplayName("BiliLive-Go!")
 
 	view := qamel.NewViewer()
-
 	view.SetSource("qrc:/res/main.qml")
 	view.SetResizeMode(qamel.SizeRootObjectToView)
 	view.SetTitle("BiliLive-Go!")

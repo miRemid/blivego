@@ -21,9 +21,10 @@ Item {
         function _onSuccess(jsonValue) {
             indexView.visible = true
             let data = JSON.parse(jsonValue)
-            for (let key in data) {
-                console.log(key, data[key])
-            }
+            indexView.avatarURL = data["avatar"]
+            indexView.uname = data["uname"]
+            indexView.fans = data["fans"]
+            indexView.roomid = data["roomid"]
         }
 
         onError: (error) => _onError(error)
@@ -42,11 +43,9 @@ Item {
         anchors.centerIn: parent
         z: 2
     }
-    
     Component.onCompleted: {
         infomationAPI.getInfomation()
     }
-
     Connections {
         target: loginView
         onSuccess: {

@@ -62,7 +62,7 @@ func testCheckCookies(t *testing.T) {
 	log.Println(info)
 }
 
-func TestLoadCookies(t *testing.T) {
+func testLoadCookies(t *testing.T) {
 	if err := loadCookies(); err != nil {
 		if os.IsNotExist(err) {
 			testGetQRCode()
@@ -87,4 +87,32 @@ getInfo:
 	} else {
 		log.Println(response)
 	}
+}
+
+func TestRoom(t *testing.T) {
+	room, err := GetLiveRoomInfo(525826)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(room.Code)
+	log.Println(room.Message)
+	log.Println(room.Data.Roomid)
+}
+
+func TestGetFollow(t *testing.T) {
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			testGetQRCode()
+			goto getInfo
+		}
+		log.Fatal(err)
+	}
+getInfo:
+	flo, err := GetFollow()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(flo.Code)
+	log.Println(flo.Message)
+	log.Println(flo.Data.Follower)
 }

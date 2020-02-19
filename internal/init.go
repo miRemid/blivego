@@ -1,6 +1,11 @@
 package internal
 
-import "bililive-go/internal/api/models"
+import (
+	"bililive-go/internal/api/models"
+	"encoding/json"
+	"io/ioutil"
+	"os"
+)
 
 func init() {
 	RegisterQmlInfomation("Server", 1, 0, "Infomation")
@@ -20,9 +25,8 @@ type BackEndError struct {
 // UserDisplay 用于展示的用户信息
 type UserDisplay struct {
 	Uname      string `json:"uname"`
-	UID        int    `json:"uid"`
 	Fans       int    `json:"fans"`
-	Avator     string `json:"avator"`
+	Avator     string `json:"avatar"`
 	Roomid     int    `json:"roomid"`
 	RoomStatus int    `json:"status"`
 	RoomTitle  string `json:"title"`
@@ -37,7 +41,28 @@ type ItemList struct {
 
 // Item 分区信息
 type Item struct {
-	ID       int    `json:"id"`
-	ParentID int    `json:"parent_id"`
+	ID       string `json:"id"`
+	ParentID string `json:"parent_id"`
 	Name     string `json:"name"`
+}
+
+func saveLiveItems(lives models.LiveItems) error {
+	var list = make([]ItemList, 0)
+	l := lives.Data
+	for _, v := range l {
+		var tmp ItemList
+		tmp.ID = v.ID
+		tmp.Name = v.Name
+		tmp.Items = make([]Item, 0)
+		for _, value := range v.List {
+			var item Item
+			item.ID = value.ID
+			item.ParentID = value.ParentID
+			item.Name = value.Name
+			tmp.Items = append(tmp.Items, item)
+		}
+		list = append(list, tmp)
+	}
+	data, _ := json.MarshalIndent(list, "", "\t")
+	return ioutil.WriteFile("live.json", data, os.ModePerm)
 }
