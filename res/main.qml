@@ -1,12 +1,18 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.13
+import QtQuick.Window 2.12
 import Server 1.0 as Server
 import "components" as MyComponents
 
-Item {
+ApplicationWindow {
     id: root
     width: 300
     height: 500
+    visible: true
+    maximumHeight: 500
+    maximumWidth: 300
+    minimumHeight: 500
+    minimumWidth: 300
 
     Server.Infomation {
         id: infomationAPI
@@ -38,7 +44,7 @@ Item {
         z: 1
     }
     MyComponents.Login {
-        id: "loginView"
+        id: loginView
         visible: false
         anchors.centerIn: parent
         z: 2

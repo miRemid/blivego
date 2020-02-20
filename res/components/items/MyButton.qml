@@ -6,8 +6,20 @@ Item {
     id : mybutton
     width: 50
     height: 50
- 
-    signal clicked();
+
+    property bool status: false
+    property color rawColor: "#0099e6"
+    property color rawTextColor: "#fff"
+    property color hoverColor: "#0099e6"
+    property color hoverTextColor: "#fff"
+
+    property string rawText: "Start!"
+    property string afterText: "Live"
+
+
+    signal close()
+    signal start()
+    signal click()
     
     Rectangle{
         id : toprect
@@ -23,13 +35,25 @@ Item {
             hoverEnabled : true
             onClicked: {
                 animation.start();
-                mybutton.clicked();
+                if(mybutton.status) {
+                    mytext.text = qsTr(mybutton.rawText)
+                    mytext.color = mybutton.rawTextColor
+                    toprect.color = mybutton.rawColor
+                    mybutton.close()
+                }else {
+                    mytext.text = qsTr(mybutton.afterText)
+                    toprect.color = mybutton.hoverColor
+                    mytext.color = mybutton.hoverTextColor
+                    mybutton.start()
+                }
+                mybutton.status = !mybutton.status
+                mybutton.click()
             }
             onEntered: {
                 animation.start();
             }
             onExited: {
-                toprect.color = "#0099e6";
+                // toprect.color = "#0099e6";
             }
         }
     }
@@ -48,8 +72,8 @@ Item {
     Text {
         id: mytext
         anchors.centerIn: toprect
-        text: qsTr("Live!")
-        color: "#fff"
+        text: qsTr(mybutton.rawText)
+        color: mybutton.rawTextColor
         font.pixelSize : 16
     }
  

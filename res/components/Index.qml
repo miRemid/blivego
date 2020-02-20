@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtGraphicalEffects 1.0
+import QtQuick.Window 2.12
 import "fonts/FontAwesome" as FontAwesome
 import "items" as Items
 
@@ -109,7 +110,7 @@ Rectangle {
     }
     
     // 直播采集数据
-    Row{
+    Item{
         id: liveStatus
         visible: false
         width: root.width
@@ -119,9 +120,8 @@ Rectangle {
             horizontalCenter: root.horizontalCenter
         }        
         // 观看人数
-        spacing: 4
         Items.Data {
-            id: red
+            id: populate
             width: 80
             title: "人气"
             titleColor: "#0099e6"
@@ -130,35 +130,56 @@ Rectangle {
             }
         }
         Items.Data {
+            id: gift
             width: 80
             title: "礼物"
             titleColor: "#0099e6"
 
             anchors {
-                left: red.right
+                left: populate.right
                 leftMargin: 10
                 verticalCenter: parent.verticalCenter
             }
         }
         Items.Data {
+            id: danmaku
             width: 80
             title: "弹幕"        
             titleColor: "#0099e6"
             anchors {
-                right: red.left
+                right: populate.left
                 rightMargin: 10
                 verticalCenter: parent.verticalCenter
             }
         }
     }
 
-    MyButton {
+    Items.MyButton {
         id: btn
         anchors {
             horizontalCenter: root.horizontalCenter
             bottom: root.bottom
             bottomMargin: 30
         }
+        onStart: {
+            liveInfo.visible = true
+        }
+        onClose: {
+            liveStatus.visible = false
+        }
     }
 
+    Items.LiveInput {
+        id: liveInfo
+        width: root.width
+        height: root.height
+
+        onSuccess: (title, id) => {
+            liveStatus.visible = true
+            liveInfo.visible = false
+            console.log(title)
+            console.log(id)
+        }
+
+    }
 }
