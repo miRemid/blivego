@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.12
+import Server 1.0 as Server
 import "fonts/FontAwesome" as FontAwesome
 import "items" as Items
 
@@ -17,6 +18,20 @@ Rectangle {
     property int roomid: 114154
 
     color: "#e6f7ff"
+
+    Server.Websocket {
+        id: websocket
+        visible: false
+        onDanmaku: (msg) => {
+            console.log(msg)
+        }
+        onMessage: (msg) => {
+            console.log(msg)
+        }
+        onHot: (msg) => {
+            console.log(msg)
+        }
+    }
 
     Image {  
         id: rocket  
@@ -163,6 +178,7 @@ Rectangle {
         }
         onStart: {
             liveInfo.visible = true
+            websocket.start()
         }
         onClose: {
             liveStatus.visible = false

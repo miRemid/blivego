@@ -94,31 +94,54 @@ type UserData2 struct {
 	AnswerStatus   int            `json:"answer_status"`
 }
 
-type LiveRoom struct {
-	Common
-	Data LiveRoomData `json:"data"`
-}
-
-type LiveRoomData struct {
-	RoomStatus    int    `json:"roomStatus"`
-	RoundStatus   int    `json:"roundStatus"`
-	LiveStatus    int    `json:"liveStatus"`
-	URL           string `json:"url"`
-	Title         string `json:"title"`
-	Cover         string `json:"cover"`
-	Online        int    `json:"online"`
-	Roomid        int    `json:"roomid"`
-	BroadcastType int    `json:"broadcast_type"`
-	OnlineHidden  int    `json:"online_hidden"`
-}
-
+// Follow 粉丝信息api
 type Follow struct {
 	Common
 	Data FollowData `json:"data"`
 }
 
+// FollowData 粉丝数据
 type FollowData struct {
 	Following    int `json:"following"`
 	Follower     int `json:"follower"`
 	DynamicCount int `json:"dynamic_count"`
+}
+
+// UserInfomation 个人信息
+type UserInfomation struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	TTL     int    `json:"ttl"`
+	Data    struct {
+		Mid       int     `json:"mid"`
+		Name      string  `json:"name"`
+		Sex       string  `json:"sex"`
+		Face      string  `json:"face"`
+		Sign      string  `json:"sign"`
+		Rank      int     `json:"rank"`
+		Level     int     `json:"level"`
+		Jointime  int     `json:"jointime"`
+		Moral     int     `json:"moral"`
+		Silence   int     `json:"silence"`
+		Birthday  string  `json:"birthday"`
+		Coins     float64 `json:"coins"`
+		FansBadge bool    `json:"fans_badge"`
+		Official  struct {
+			Role  int    `json:"role"`
+			Title string `json:"title"`
+			Desc  string `json:"desc"`
+			Type  int    `json:"type"`
+		} `json:"official"`
+		Vip struct {
+			Type      int `json:"type"`
+			Status    int `json:"status"`
+			ThemeType int `json:"theme_type"`
+		} `json:"vip"`
+		IsFollowed bool   `json:"is_followed"`
+		TopPhoto   string `json:"top_photo"`
+		Theme      struct {
+		} `json:"theme"`
+		SysNotice struct {
+		} `json:"sys_notice"`
+	} `json:"data"`
 }

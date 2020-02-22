@@ -116,3 +116,90 @@ getInfo:
 	log.Println(flo.Message)
 	log.Println(flo.Data.Follower)
 }
+
+func TestStartLive(t *testing.T) {
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			testGetQRCode()
+			goto getInfo
+		}
+		log.Fatal(err)
+	}
+getInfo:
+	res, err := StartLive(56159, "107")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(res.Message)
+	log.Println(res.Code)
+	log.Println(res.Data.Rtmp.Addr)
+}
+
+func TestStopLive(t *testing.T) {
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			testGetQRCode()
+			goto getInfo
+		}
+		log.Fatal(err)
+	}
+getInfo:
+	res, err := StopLive(56159)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(res.Message)
+	log.Println(res.Code)
+	log.Println(res.Data)
+}
+
+func TestUpdateTitle(t *testing.T) {
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			testGetQRCode()
+			goto getInfo
+		}
+		log.Fatal(err)
+	}
+getInfo:
+	res, err := UpdateTitle(56159, "Test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(res.Message)
+	log.Println(res.Code)
+	log.Println(res.Data)
+}
+
+func TestSendDanmaku(t *testing.T) {
+	if err := loadCookies(); err != nil {
+		if os.IsNotExist(err) {
+			testGetQRCode()
+			goto getInfo
+		}
+		log.Fatal(err)
+	}
+getInfo:
+	res, err := SendDanmaku("tset", 56159, 16777215, 25)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(res.Code)
+	log.Println(res.Message)
+	log.Println(res.Data)
+
+	resp, err := UpdateTitle(56159, "Test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(resp.Message)
+	log.Println(resp.Code)
+	log.Println(resp.Data)
+}
+
+func TestGetInfomation(t *testing.T) {
+	_, err := GetUserInfomation(525826)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

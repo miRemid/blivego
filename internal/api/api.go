@@ -39,8 +39,13 @@ const (
 
 	cookiesPath = "static/user/cookies.json"
 
-	liveDanmaURL = "https://api.live.bilibili.com/msg/send"
-	liveList     = "https://api.live.bilibili.com/room/v1/Area/getList"
+	InfoURL = "https://api.bilibili.com/x/space/acc/info?mid=%d&jsonp=jsonp"
+
+	liveDanmaURL   = "https://api.live.bilibili.com/msg/send"
+	liveList       = "https://api.live.bilibili.com/room/v1/Area/getList"
+	upDateTitleURL = "https://api.live.bilibili.com/room/v1/Room/update"
+	startLiveURL   = "https://api.live.bilibili.com/room/v1/Room/startLive"
+	stopLiveURL    = "https://api.live.bilibili.com/room/v1/Room/stopLive"
 )
 
 var (
@@ -174,6 +179,20 @@ func GetPersonInfomation() (models.FullUserInfomation, error) {
 	return user, err
 }
 
+// GetUserInfomation 获取用户信息
+func GetUserInfomation(mid int) (models.UserInfomation, error) {
+	var user models.UserInfomation
+	req, _ := http.NewRequest("GET", fmt.Sprintf(InfoURL, mid), nil)
+	resp, err := client.Do(req)
+	if err != nil {
+		return user, err
+	}
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(data, &user)
+	return user, err
+}
+
 // SaveCookies 保存cookies到文件中
 func SaveCookies() error {
 	return jar.Save()
@@ -261,4 +280,69 @@ func GetLiveList() (models.LiveItems, error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &items)
 	return items, err
+}
+
+// StartLive 开启直播
+func StartLive(roomid int, areaV2 string) (models.StartLive, error) {
+	var start models.StartLive
+	data := make(url.Values)
+	data.Set("room_id", fmt.Sprintf("%d", roomid))
+	data.Set("platform", "pc")
+	data.Set("area_v2", areaV2)
+	data.Set("csrf_token", CSRF)
+	data.Set("csrf", CSRF)
+	log.Print(data.Encode())
+	req, _ := http.NewRequest("POST", startLiveURL, strings.NewReader(data.Encode()))
+	resp, err := client.Do(req)
+	if err != nil {
+		return start, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Info(string(body))
+	err = json.Unmarshal(body, &start)
+	return start, err
+}
+
+// StopLive 停止直播
+func StopLive(roomid int) (models.StopLive, error) {
+	var stop models.StopLive
+	data := make(url.Values)
+	data.Set("room_id", fmt.Sprintf("%d", roomid))
+	data.Set("platform", "pc")
+	data.Set("csrf_token", CSRF)
+	data.Set("csrf", CSRF)
+	req, _ := http.NewRequest("POST", stopLiveURL, strings.NewReader(data.Encode()))
+	resp, err := client.Do(req)
+	if err != nil {
+		return stop, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Info(string(body))
+	err = json.Unmarshal(body, &stop)
+	return stop, err
+}
+
+// UpdateTitle 更新标题
+func UpdateTitle(roomid int, title string) (models.Common, error) {
+	var common models.Common
+	data := make(url.Values)
+	data.Set("room_id", fmt.Sprintf("%d", roomid))
+	data.Set("title", title)
+	data.Set("csrf_token", CSRF)
+	data.Set("csrf", CSRF)
+	req, _ := http.NewRequest("POST", upDateTitleURL, strings.NewReader(data.Encode()))
+	req.Header.Set("Referer", "https://link.bilibili.com/p/center/index")
+	req.Header.Set("Origin", "https://link.bilibili.com")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		return common, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Print(string(body))
+	err = json.Unmarshal(body, &common)
+	return common, err
 }

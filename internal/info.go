@@ -72,6 +72,7 @@ func (info Infomation) getInfomation() {
 					response.Roomid = live.Data.Roomid
 					response.RoomStatus = live.Data.RoomStatus
 					response.RoomTitle = live.Data.Title
+					roomid = live.Data.Roomid
 				}
 				// 获取本人粉丝数
 				if stat, err := api.GetFollow(); err != nil {

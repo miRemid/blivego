@@ -10,10 +10,12 @@ import (
 func init() {
 	RegisterQmlInfomation("Server", 1, 0, "Infomation")
 	RegisterQmlLogin("Server", 1, 0, "Login")
+	RegisterQmlWebsocket("Server", 1, 0, "Websocket")
 }
 
 var (
-	user models.UserData2
+	user   models.UserData2
+	roomid int
 )
 
 // BackEndError 错误信息
@@ -65,4 +67,11 @@ func saveLiveItems(lives models.LiveItems) error {
 	}
 	data, _ := json.MarshalIndent(list, "", "\t")
 	return ioutil.WriteFile("live.json", data, os.ModePerm)
+}
+
+// WebsocketMessage 直播信息
+type WebsocketMessage struct {
+	Uname   interface{} `json:"uname"`
+	Face    interface{} `json:"face"`
+	Message interface{} `json:"message"`
 }
