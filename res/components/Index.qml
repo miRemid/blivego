@@ -23,12 +23,15 @@ Rectangle {
         id: websocket
         visible: false
         onDanmaku: (msg) => {
-            console.log(msg)
+            danmakulist.append(msg)
         }
         onMessage: (msg) => {
             console.log(msg)
         }
         onHot: (msg) => {
+            populate.num = msg
+        }
+        onGift: (msg) => {
             console.log(msg)
         }
     }
@@ -168,7 +171,9 @@ Rectangle {
             }
         }
     }
-
+    Items.Danmaku {
+        id: danmakulist
+    }
     Items.MyButton {
         id: btn
         anchors {
@@ -177,25 +182,15 @@ Rectangle {
             bottomMargin: 30
         }
         onStart: {
-            liveInfo.visible = true
+            populate.num = "0"
+            gift.num = "0"
+            danmaku.num = "0"
+            danmakulist.show()
+            liveStatus.visible = true
             websocket.start()
         }
         onClose: {
-            liveStatus.visible = false
+            danmakulist.quit()
         }
-    }
-
-    Items.LiveInput {
-        id: liveInfo
-        width: root.width
-        height: root.height
-
-        onSuccess: (title, id) => {
-            liveStatus.visible = true
-            liveInfo.visible = false
-            console.log(title)
-            console.log(id)
-        }
-
     }
 }

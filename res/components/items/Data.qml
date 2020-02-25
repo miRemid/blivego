@@ -12,7 +12,9 @@ Item {
 
     property string num: "6"
     property color dataColor: "#000"
-
+    function test() {
+        console.log(777)
+    }
     // 1. title
     Item {
         id: title

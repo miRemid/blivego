@@ -1,15 +1,26 @@
 import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.12
 
-Item {
+ApplicationWindow {
     id: container
     height: 500
     width: 300
+    x: Screen.desktopAvailableWidth
+    y: Screen.desktopAvailableHeight/2
+    color: "transparent"
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
 
-    // property string name: "test"
-    // property string message: "value"
-    // property string avator: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg"
+    function append(message) {
+        console.log(message)
+        let data = JSON.parse(message)
+        listModel.append({
+            avatar: data["face"],
+            uname: data["uname"],
+            message: data["message"],
+        })
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -17,10 +28,8 @@ Item {
             id: listView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.margins: pane.leftPadding + messageField.leftPadding
             displayMarginBeginning: 40
             displayMarginEnd: 40
-            verticalLayoutDirection: ListView.BottomToTop
             spacing: 12
             delegate: Column {
                 spacing: 6
@@ -55,46 +64,10 @@ Item {
                 id: listModel
                 ListElement {
                     avatar: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg"
-                    uname: "test"
-                    message: "testsetset"
+                    uname: "测试君"
+                    message: "这是一条测试弹幕"
                 }
             }
-            ScrollBar.vertical: ScrollBar{}
-        }
-        Pane {
-            id: pane
-            Layout.fillWidth: true
-
-            RowLayout {
-                width: parent.width
-
-                TextArea {
-                    id: messageField
-                    Layout.fillWidth: true
-                    placeholderText: qsTr("Compose message")
-                    wrapMode: TextArea.Wrap
-                }
-
-                Button {
-                    id: sendButton
-                    text: qsTr("Send")
-                    enabled: messageField.length > 0
-                    onClicked: {
-                        listView.model.sendMessage(inConversationWith, messageField.text);
-                        messageField.text = "";
-                    }
-                }
-            }
-        }
-    }
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            listModel.append({
-                avatar: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg",
-                uname: "test",
-                message: "testsetset"
-            })
         }
     }
 }
