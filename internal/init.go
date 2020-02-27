@@ -74,4 +74,6 @@ type WebsocketMessage struct {
 	Uname   interface{} `json:"uname"`
 	Face    interface{} `json:"face"`
 	Message interface{} `json:"message"`
+	Gift    bool        `json:"gift"`
+	Number  int         `json:"num"`
 }

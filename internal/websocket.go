@@ -23,7 +23,6 @@ type Websocket struct {
 	_ func(string) `signal:"message"`
 	_ func(string) `signal:"danmaku"`
 	_ func(string) `signal:"hot"`
-	_ func()       `signal:"gift"`
 }
 
 func (websocket *Websocket) parse(message []byte) {
@@ -65,6 +64,7 @@ func (websocket *Websocket) parse(message []byte) {
 				Uname:   cmd.Info[2][1],
 				Face:    res.Data.Face,
 				Message: danmaku.Info[1],
+				Gift:    false,
 			})
 			if err != nil {
 				e, _ := utils.EncodeJSON(BackEndError{
@@ -78,12 +78,13 @@ func (websocket *Websocket) parse(message []byte) {
 			break
 		case "SEND_GIFT":
 			var g model.Gift
-			websocket.gift()
 			json.Unmarshal(body, &g)
 			str, _ := utils.EncodeJSON(WebsocketMessage{
 				Uname:   g.Data.Uname,
 				Face:    g.Data.Face,
 				Message: fmt.Sprintf("%s (%s) x %d", g.Data.GiftName, g.Data.CoinType, g.Data.Num),
+				Gift:    true,
+				Number:  g.Data.Num,
 			})
 			websocket.danmaku(str)
 			break

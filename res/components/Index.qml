@@ -23,16 +23,19 @@ Rectangle {
         id: websocket
         visible: false
         onDanmaku: (msg) => {
-            danmakulist.append(msg)
+            let data = JSON.parse(msg)
+            if (data["gift"]) {
+                gift.num = gift.num + data["num"]
+            }else {
+                danmaku.num = danmaku.num + 1
+            }
+            danmakulist.append(data)
         }
         onMessage: (msg) => {
             console.log(msg)
         }
         onHot: (msg) => {
-            populate.num = msg
-        }
-        onGift: (msg) => {
-            console.log(msg)
+            populate.num = Number(msg)
         }
     }
 
@@ -152,7 +155,6 @@ Rectangle {
             width: 80
             title: "礼物"
             titleColor: "#0099e6"
-
             anchors {
                 left: populate.right
                 leftMargin: 10
@@ -190,7 +192,7 @@ Rectangle {
             websocket.start()
         }
         onClose: {
-            danmakulist.quit()
+            danmakulist.close()
         }
     }
 }

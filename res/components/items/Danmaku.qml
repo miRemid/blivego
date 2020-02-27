@@ -10,18 +10,15 @@ ApplicationWindow {
     x: Screen.desktopAvailableWidth
     y: Screen.desktopAvailableHeight/2
     color: "transparent"
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
-
-    function append(message) {
-        console.log(message)
-        let data = JSON.parse(message)
-        listModel.append({
+    flags: Qt.CoverWindow | Qt.ToolTip | Qt.WindowTransparentForInput | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
+    function append(data) {
+        listModel.insert(0, {
             avatar: data["face"],
             uname: data["uname"],
             message: data["message"],
+            gift: data["gift"],
         })
     }
-
     ColumnLayout {
         anchors.fill: parent
         ListView {
@@ -30,6 +27,7 @@ ApplicationWindow {
             Layout.fillHeight: true
             displayMarginBeginning: 40
             displayMarginEnd: 40
+            verticalLayoutDirection: ListView.BottomToTop
             spacing: 12
             delegate: Column {
                 spacing: 6
@@ -40,19 +38,20 @@ ApplicationWindow {
                     anchors.left: parent.left
                     Image {
                         id: avatar
-                        height: 25
-                        width: 25
+                        height: 30
+                        width: 30
                         fillMode: Image.PreserveAspectFit
                         source: model.avatar
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                     Rectangle {
-                        width: Math.min(messageText.implicitWidth + 24, listView.width - avatar.width - messageRow.spacing)
-                        height: messageText.implicitHeight + 24
                         color: "steelblue"
+                        width: Math.min(messageText.implicitWidth + 24, listView.width - avatar.width - messageRow.spacing)
+                        height: messageText.implicitHeight + 24                       
                         Label {
                             id: messageText
-                            text: model.message
                             color: "white"
+                            text: model.gift ? uname + ': <font color="#ffcccc">' + message + "</font>" : uname + ': <font color="white">' + message + "</font>"
                             anchors.fill: parent
                             anchors.margins: 12
                             wrapMode: Label.Wrap
@@ -66,8 +65,51 @@ ApplicationWindow {
                     avatar: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg"
                     uname: "测试君"
                     message: "这是一条测试弹幕"
+                    gift: true
+                }
+            }
+            populate: Transition{
+                NumberAnimation{
+                    property: "opacity"
+                    from: 0
+                    to: 1.0
+                    duration: 200
+                }
+            }
+            displaced: Transition {
+                SpringAnimation{
+                    property: "y"
+                    spring: 2
+                    damping: 0.5
+                    epsilon: 0.25
+                }
+            }
+            add:Transition {
+                ParallelAnimation{
+                    NumberAnimation{
+                        property: "opacity"
+                        from: 0
+                        to : 1.0
+                        duration: 100
+                    }
+                    NumberAnimation{
+                        property: "y"
+                        from: 0
+                        duration:  200
+                    }
                 }
             }
         }
     }
+    // MouseArea {
+    //     anchors.fill: parent
+    //     onClicked: {
+    //         listModel.insert(0, {
+    //             avatar: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg",
+    //             uname: "测试君",
+    //             message: "test",
+    //             gift: false,
+    //         })
+    //     }
+    // }
 }

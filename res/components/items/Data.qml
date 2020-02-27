@@ -10,7 +10,7 @@ Item {
     property string title: "数据"
     property color titleColor: "#cceeff"
 
-    property string num: "6"
+    property int num: 0
     property color dataColor: "#000"
     function test() {
         console.log(777)
