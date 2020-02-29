@@ -101,15 +101,5 @@ ApplicationWindow {
             }
         }
     }
-    // MouseArea {
-    //     anchors.fill: parent
-    //     onClicked: {
-    //         listModel.insert(0, {
-    //             avatar: "https://i.loli.net/2019/11/03/r7vSwJsUzfWxYmk.jpg",
-    //             uname: "测试君",
-    //             message: "test",
-    //             gift: false,
-    //         })
-    //     }
-    // }
+    
 }

@@ -16,8 +16,12 @@ Rectangle {
     property string uname: "测试用户名"
     property int fans: 66
     property int roomid: 114154
+    property Component danmakuComponent: null
+    property var childWin: null
 
     color: "#e6f7ff"
+
+    
 
     Server.Websocket {
         id: websocket
@@ -29,7 +33,7 @@ Rectangle {
             }else {
                 danmaku.num = danmaku.num + 1
             }
-            danmakulist.append(data)
+            childWin.append(data)
         }
         onMessage: (msg) => {
             console.log(msg)
@@ -187,12 +191,16 @@ Rectangle {
             populate.num = "0"
             gift.num = "0"
             danmaku.num = "0"
-            danmakulist.show()
+
+            danmakuComponent = Qt.createComponent("items/Danmaku.qml");
+            childWin = danmakuComponent.createObject(root);
+            childWin.show();
+
             liveStatus.visible = true
             websocket.start()
         }
         onClose: {
-            danmakulist.close()
+            childWin.close()
         }
     }
 }

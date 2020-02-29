@@ -18,6 +18,7 @@ func main() {
 
 	app := qamel.NewApplication(len(os.Args), os.Args)
 	app.SetApplicationDisplayName("BiliLive-Go!")
+	app.SetWindowIcon(":/res/icon.png")
 
 	engine := qamel.NewEngine()
 	engine.Load("qrc:/res/main.qml")

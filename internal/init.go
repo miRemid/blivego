@@ -11,6 +11,7 @@ func init() {
 	RegisterQmlInfomation("Server", 1, 0, "Infomation")
 	RegisterQmlLogin("Server", 1, 0, "Login")
 	RegisterQmlWebsocket("Server", 1, 0, "Websocket")
+	RegisterQmlSend("Server", 1, 0, "Send")
 }
 
 var (

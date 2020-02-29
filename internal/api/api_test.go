@@ -187,14 +187,6 @@ getInfo:
 	log.Println(res.Code)
 	log.Println(res.Message)
 	log.Println(res.Data)
-
-	resp, err := UpdateTitle(56159, "Test")
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(resp.Message)
-	log.Println(resp.Code)
-	log.Println(resp.Data)
 }
 
 func TestGetInfomation(t *testing.T) {
