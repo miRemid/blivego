@@ -8,9 +8,9 @@ ApplicationWindow {
     height: 500
     width: 300
     x: Screen.desktopAvailableWidth
-    y: Screen.desktopAvailableHeight/2
-    color: "transparent"
-    flags: Qt.CoverWindow | Qt.ToolTip | Qt.WindowTransparentForInput | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
+    y: Screen.desktopAvailableHeight / 4
+    color: "transparent"    
+    flags: Qt.CoverWindow | Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowTransparentForInput
     function append(data) {
         listModel.insert(0, {
             avatar: data["face"],
@@ -46,15 +46,17 @@ ApplicationWindow {
                     }
                     Rectangle {
                         color: "steelblue"
-                        width: Math.min(messageText.implicitWidth + 24, listView.width - avatar.width - messageRow.spacing)
+                        width: 200
                         height: messageText.implicitHeight + 24                       
-                        Label {
+                        TextArea {
                             id: messageText
                             color: "white"
+                            readOnly: true
+                            textFormat: Text.RichText
                             text: model.gift ? uname + ': <font color="#ffcccc">' + message + "</font>" : uname + ': <font color="white">' + message + "</font>"
                             anchors.fill: parent
                             anchors.margins: 12
-                            wrapMode: Label.Wrap
+                            wrapMode: TextEdit.Wrap
                         }
                     }
                 }
@@ -90,16 +92,15 @@ ApplicationWindow {
                         property: "opacity"
                         from: 0
                         to : 1.0
-                        duration: 100
+                        duration: 200
                     }
                     NumberAnimation{
                         property: "y"
                         from: 0
-                        duration:  200
+                        duration:  500
                     }
                 }
             }
         }
     }
-    
 }

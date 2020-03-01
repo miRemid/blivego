@@ -33,13 +33,11 @@ func (websocket *Websocket) parse(message []byte) {
 	body := message[16:head.Length]
 	switch head.Type {
 	case danmagu.WsHeartbeatReply:
-		websocket.message("接收到一条心跳响应")
 		var rqz model.Population
 		binary.Read(bytes.NewReader(body), binary.BigEndian, &rqz)
 		websocket.hot(fmt.Sprintf("%v", rqz.Value))
 		break
 	case danmagu.WsMessage:
-		websocket.message("接收到一条消息")
 		var cmd model.CMD
 		_ = json.Unmarshal(body, &cmd)
 		switch cmd.Cmd {
