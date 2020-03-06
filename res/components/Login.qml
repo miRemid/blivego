@@ -86,9 +86,7 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 if (qrcode.ob) {
-                    console.log("过期了")
-                }else {
-                    console.log("> <")
+                    onStart()
                 }
             }
         }

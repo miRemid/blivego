@@ -27,12 +27,12 @@ ApplicationWindow {
         }
 
         function _onSuccess(jsonValue) {
-            indexView.visible = true
             let data = JSON.parse(jsonValue)
             indexView.avatarURL = data["avatar"]
             indexView.uname = data["uname"]
             indexView.fans = data["fans"]
             indexView.roomid = data["roomid"]
+            indexView.visible = true
         }
 
         onError: (error) => _onError(error)
@@ -58,9 +58,10 @@ ApplicationWindow {
         target: loginView
         onSuccess: {
             loginView.visible = false
-            indexView.visible = true
+            infomationAPI.getInfomation()
         }
     }
+    
     MyComponents.FlowWindow {
         id: flowWindow
         visible: true        
@@ -75,7 +76,7 @@ ApplicationWindow {
         MenuItem {
             text: flowWindow.visible ? qsTr("隐藏悬浮窗") : qsTr("显示悬浮窗")
             onTriggered: {
-                flowWindow.visible = !flowWindow.visible
+                flowWindow.visible = flowWindow.visible ? false : true
             }
         }
         MenuItem {
@@ -90,9 +91,6 @@ ApplicationWindow {
         visible: true
         iconSource: "qrc:/res/icon.png"
         tooltip: "Bililive-Go!"
-        onActivated: {
-            console.log("托盘激活")
-        }
         menu: systemTrayMenu
     }
 
